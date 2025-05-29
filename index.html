@@ -209,7 +209,7 @@
 <body>
     <div class="container">
         <div class="control-bar">
-            <button class="start-pause-btn" id="startPauseBtn"></button>
+            <button class="start-pause-btn" id="startPauseBtn">start</button>
         </div>
 
         <div class="main-area">
@@ -308,14 +308,13 @@
 
             start() {
                 this.running = true;
-                this.startBtn.classList.remove('paused');
-                this.updateButtonColor();
+                this.startBtn.textContent = 'pause';
                 this.interval = setInterval(() => this.tick(), 1000);
             }
 
             pause() {
                 this.running = false;
-                this.startBtn.classList.add('paused');
+                this.startBtn.textContent = 'start';
                 clearInterval(this.interval);
             }
 
@@ -339,7 +338,6 @@
                 
                 this.timeLeft = this.phases[this.currentPhase].duration;
                 this.render();
-                this.updateButtonColor();
             }
 
             complete() {
@@ -375,9 +373,6 @@
                 } else {
                     this.circle.classList.remove('red');
                 }
-                
-                // Update button color
-                this.updateButtonColor();
                 
                 // Update progress
                 const elapsed = phase.duration - this.timeLeft;

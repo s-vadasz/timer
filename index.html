@@ -97,25 +97,25 @@
 
         .progress-ring {
             position: absolute;
-            top: -1px;
-            left: -1px;
-            width: 282px;
-            height: 282px;
+            top: -5px;
+            left: -5px;
+            width: 290px;
+            height: 290px;
             transform: rotate(-90deg);
         }
 
         .progress-ring-circle {
             fill: none;
-            stroke-width: 2;
+            stroke-width: 9;
             transition: stroke-dashoffset 1s linear;
         }
 
         .progress-bg {
-            stroke: rgba(255, 255, 255, 0.2);
+            stroke: rgba(255, 255, 255, 0.1);
         }
 
         .progress-bar {
-            stroke: rgba(255, 255, 255, 0.8);
+            stroke: #444;
         }
 
         .status-dots {
@@ -215,9 +215,9 @@
         <div class="main-area">
             <div class="timer-circle" id="timerCircle">
                 <svg class="progress-ring">
-                    <circle class="progress-ring-circle progress-bg" cx="141" cy="141" r="140"></circle>
-                    <circle class="progress-ring-circle progress-bar" id="progressBar" cx="141" cy="141" r="140" 
-                            stroke-dasharray="879.65" stroke-dashoffset="879.65"></circle>
+                    <circle class="progress-ring-circle progress-bg" cx="145" cy="145" r="135"></circle>
+                    <circle class="progress-ring-circle progress-bar" id="progressBar" cx="145" cy="145" r="135" 
+                            stroke-dasharray="848.23" stroke-dashoffset="848.23"></circle>
                 </svg>
                 <div class="timer-display" id="timerDisplay">1:00</div>
             </div>
@@ -376,7 +376,7 @@
                 
                 // Update progress
                 const elapsed = phase.duration - this.timeLeft;
-                const circumference = 879.65;
+                const circumference = 848.23;
                 const offset = circumference - (elapsed / phase.duration) * circumference;
                 this.progress.style.strokeDashoffset = offset;
                 

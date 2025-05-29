@@ -28,41 +28,35 @@
             flex-direction: column;
             height: 100vh;
             width: 100vw;
-            padding: 24px;
+            padding: 32px 24px 24px 24px;
             background: #f8f8f8;
             position: relative;
         }
 
         .control-bar {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
-            margin-bottom: 32px;
+            margin-bottom: 40px;
             height: 32px;
         }
 
         .start-pause-btn {
-            background: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
             border: none;
-            color: #2a2a2a;
-            font-size: 12px;
-            font-weight: 400;
-            letter-spacing: 0.8px;
             cursor: pointer;
-            text-transform: lowercase;
-            padding: 0;
-            transition: opacity 0.2s ease;
+            transition: all 0.3s ease;
+            background: #22c55e;
         }
 
-        .start-pause-btn:hover {
-            opacity: 0.6;
+        .start-pause-btn.red {
+            background: #ef4444;
         }
 
-        .phase-counter {
-            font-size: 11px;
-            color: #888;
-            font-weight: 300;
-            letter-spacing: 0.5px;
+        .start-pause-btn.paused {
+            opacity: 0.4;
         }
 
         .main-area {
@@ -72,6 +66,7 @@
             justify-content: center;
             align-items: center;
             position: relative;
+            margin-top: -10px;
         }
 
         .timer-circle {
@@ -82,20 +77,22 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #fff;
-            border: 1px solid #e8e8e8;
-            transition: border-color 0.4s ease;
+            background: #22c55e;
+            border: 1px solid #22c55e;
+            transition: all 0.4s ease;
+            margin-bottom: 60px;
         }
 
-        .timer-circle.active {
-            border-color: #bbb;
+        .timer-circle.red {
+            background: #ef4444;
+            border-color: #ef4444;
         }
 
         .timer-display {
-            font-size: 48px;
+            font-size: 56px;
             font-weight: 200;
-            color: #2a2a2a;
-            letter-spacing: -0.5px;
+            color: white;
+            letter-spacing: -1px;
             font-family: 'Helvetica Neue', Arial, sans-serif;
         }
 
@@ -110,39 +107,28 @@
 
         .progress-ring-circle {
             fill: none;
-            stroke-width: 1;
+            stroke-width: 2;
             transition: stroke-dashoffset 1s linear;
         }
 
         .progress-bg {
-            stroke: #f0f0f0;
+            stroke: rgba(255, 255, 255, 0.2);
         }
 
         .progress-bar {
-            stroke: #2a2a2a;
-            opacity: 0.3;
-        }
-
-        .phase-label {
-            position: absolute;
-            bottom: 60px;
-            font-size: 9px;
-            color: #aaa;
-            text-transform: lowercase;
-            letter-spacing: 1px;
-            font-weight: 300;
+            stroke: rgba(255, 255, 255, 0.8);
         }
 
         .status-dots {
             position: absolute;
-            bottom: 24px;
+            bottom: 80px;
             display: flex;
-            gap: 6px;
+            gap: 12px;
         }
 
         .dot {
-            width: 3px;
-            height: 3px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             background: #ddd;
             transition: background 0.2s ease;
@@ -154,49 +140,6 @@
 
         .dot.done {
             background: #888;
-        }
-
-        @media screen and (orientation: landscape) {
-            .container {
-                padding: 20px 40px;
-                flex-direction: row;
-                align-items: center;
-            }
-
-            .control-bar {
-                position: absolute;
-                top: 20px;
-                left: 40px;
-                right: 40px;
-                margin-bottom: 0;
-            }
-
-            .main-area {
-                width: 100%;
-                margin-top: 40px;
-            }
-
-            .timer-circle {
-                width: 220px;
-                height: 220px;
-            }
-
-            .progress-ring {
-                width: 222px;
-                height: 222px;
-            }
-
-            .timer-display {
-                font-size: 40px;
-            }
-
-            .phase-label {
-                bottom: 40px;
-            }
-
-            .status-dots {
-                bottom: 20px;
-            }
         }
 
         .completion-overlay {
@@ -217,7 +160,7 @@
         }
 
         .completion-content h2 {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 300;
             color: #2a2a2a;
             margin-bottom: 24px;
@@ -229,7 +172,7 @@
             background: none;
             border: none;
             color: #2a2a2a;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 400;
             letter-spacing: 0.8px;
             cursor: pointer;
@@ -240,15 +183,34 @@
         .restart-btn:hover {
             opacity: 0.6;
         }
+
+        /* Force portrait orientation */
+        @media screen and (orientation: landscape) {
+            body::before {
+                content: "Please rotate to portrait mode";
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0,0,0,0.9);
+                color: white;
+                padding: 20px;
+                border-radius: 8px;
+                z-index: 10000;
+                font-size: 16px;
+                text-align: center;
+            }
+            
+            .container {
+                opacity: 0.1;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="control-bar">
-            <button class="start-pause-btn" id="startPauseBtn">start</button>
-            <div class="phase-counter">
-                <span id="currentPhaseNum">1</span> of 9
-            </div>
+            <button class="start-pause-btn" id="startPauseBtn"></button>
         </div>
 
         <div class="main-area">
@@ -260,8 +222,6 @@
                 </svg>
                 <div class="timer-display" id="timerDisplay">1:00</div>
             </div>
-            
-            <div class="phase-label" id="phaseLabel">recovery</div>
             
             <div class="status-dots" id="statusDots">
                 <div class="dot active"></div>
@@ -288,24 +248,44 @@
         class Timer {
             constructor() {
                 this.phases = [
-                    { duration: 60, name: 'recovery' },
-                    { duration: 240, name: 'intensity' },
-                    { duration: 180, name: 'recovery' },
-                    { duration: 240, name: 'intensity' },
-                    { duration: 180, name: 'recovery' },
-                    { duration: 240, name: 'intensity' },
-                    { duration: 180, name: 'recovery' },
-                    { duration: 240, name: 'intensity' },
-                    { duration: 60, name: 'recovery' }
+                    { duration: 60, type: 'green', name: 'recovery' },
+                    { duration: 240, type: 'red', name: 'intensity' },
+                    { duration: 180, type: 'green', name: 'recovery' },
+                    { duration: 240, type: 'red', name: 'intensity' },
+                    { duration: 180, type: 'green', name: 'recovery' },
+                    { duration: 240, type: 'red', name: 'intensity' },
+                    { duration: 180, type: 'green', name: 'recovery' },
+                    { duration: 240, type: 'red', name: 'intensity' },
+                    { duration: 60, type: 'green', name: 'recovery' }
                 ];
                 
                 this.currentPhase = 0;
                 this.timeLeft = this.phases[0].duration;
                 this.running = false;
                 this.interval = null;
+                this.wakeLock = null;
                 
                 this.init();
                 this.render();
+                this.requestWakeLock();
+            }
+
+            async requestWakeLock() {
+                try {
+                    if ('wakeLock' in navigator) {
+                        this.wakeLock = await navigator.wakeLock.request('screen');
+                        console.log('Screen wake lock active');
+                        
+                        // Re-request wake lock when visibility changes
+                        document.addEventListener('visibilitychange', async () => {
+                            if (this.wakeLock !== null && document.visibilityState === 'visible') {
+                                this.wakeLock = await navigator.wakeLock.request('screen');
+                            }
+                        });
+                    }
+                } catch (err) {
+                    console.log('Wake lock not supported or failed:', err);
+                }
             }
 
             init() {
@@ -313,8 +293,6 @@
                 this.display = document.getElementById('timerDisplay');
                 this.circle = document.getElementById('timerCircle');
                 this.progress = document.getElementById('progressBar');
-                this.phaseNum = document.getElementById('currentPhaseNum');
-                this.phaseLabel = document.getElementById('phaseLabel');
                 this.dots = document.getElementById('statusDots');
                 this.overlay = document.getElementById('completionOverlay');
                 
@@ -331,15 +309,14 @@
 
             start() {
                 this.running = true;
-                this.startBtn.textContent = 'pause';
-                this.circle.classList.add('active');
+                this.startBtn.classList.remove('paused');
+                this.updateButtonColor();
                 this.interval = setInterval(() => this.tick(), 1000);
             }
 
             pause() {
                 this.running = false;
-                this.startBtn.textContent = 'start';
-                this.circle.classList.remove('active');
+                this.startBtn.classList.add('paused');
                 clearInterval(this.interval);
             }
 
@@ -363,11 +340,26 @@
                 
                 this.timeLeft = this.phases[this.currentPhase].duration;
                 this.render();
+                this.updateButtonColor();
             }
 
             complete() {
                 this.pause();
                 this.overlay.style.display = 'flex';
+                // Release wake lock when session completes
+                if (this.wakeLock) {
+                    this.wakeLock.release();
+                    this.wakeLock = null;
+                }
+            }
+
+            updateButtonColor() {
+                const phase = this.phases[this.currentPhase];
+                if (phase.type === 'red') {
+                    this.startBtn.classList.add('red');
+                } else {
+                    this.startBtn.classList.remove('red');
+                }
             }
 
             render() {
@@ -377,8 +369,16 @@
                 
                 // Update display
                 this.display.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                this.phaseNum.textContent = this.currentPhase + 1;
-                this.phaseLabel.textContent = phase.name;
+                
+                // Update circle color
+                if (phase.type === 'red') {
+                    this.circle.classList.add('red');
+                } else {
+                    this.circle.classList.remove('red');
+                }
+                
+                // Update button color
+                this.updateButtonColor();
                 
                 // Update progress
                 const elapsed = phase.duration - this.timeLeft;
@@ -405,6 +405,7 @@
                 this.timeLeft = this.phases[0].duration;
                 this.render();
                 this.overlay.style.display = 'none';
+                this.requestWakeLock(); // Re-request wake lock for new session
             }
         }
 
@@ -424,10 +425,46 @@
             lastTouch = now;
         }, false);
 
-        // Keep screen awake
-        if ('wakeLock' in navigator) {
-            navigator.wakeLock.request('screen').catch(() => {});
-        }
+        // Additional screen wake methods for iOS
+        let noSleep = {
+            enabled: false,
+            video: null,
+            
+            enable: function() {
+                if (!this.enabled) {
+                    this.video = document.createElement('video');
+                    this.video.setAttribute('muted', '');
+                    this.video.setAttribute('title', 'No Sleep');
+                    this.video.setAttribute('playsinline', '');
+                    
+                    this.video.addEventListener('loadedmetadata', () => {
+                        if (this.video.duration <= 1) {
+                            this.video.setAttribute('loop', '');
+                        }
+                    });
+                    
+                    // Create a tiny video to keep screen awake
+                    this.video.src = 'data:video/mp4;base64,AAAAIGZ0eXBtcDQyAAACAGlzb21pc28yYXZjMWdlb20AAAB4bW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAAASwAAAAAAQAAAQAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC5';
+                    
+                    this.video.play();
+                    this.enabled = true;
+                }
+            },
+            
+            disable: function() {
+                if (this.enabled && this.video) {
+                    this.video.pause();
+                    this.video.remove();
+                    this.video = null;
+                    this.enabled = false;
+                }
+            }
+        };
+
+        // Enable no-sleep when timer starts
+        document.addEventListener('click', () => {
+            noSleep.enable();
+        }, { once: true });
     </script>
 </body>
 </html>

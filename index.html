@@ -76,21 +76,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #22c55e;
-            border: 1px solid #22c55e;
+            background: #ffffff;
+            border: 1px solid #ffffff;
             transition: all 0.4s ease;
             margin-bottom: 60px;
-        }
-
-        .timer-circle.red {
-            background: #ef4444;
-            border-color: #ef4444;
         }
 
         .timer-display {
             font-size: 56px;
             font-weight: 200;
-            color: white;
+            color: #2a2a2a;
             letter-spacing: -1px;
             font-family: 'Helvetica Neue', Arial, sans-serif;
         }
@@ -106,16 +101,21 @@
 
         .progress-ring-circle {
             fill: none;
-            stroke-width: 9;
+            stroke-width: 12;
+            stroke-linecap: round;
             transition: stroke-dashoffset 1s linear;
         }
 
         .progress-bg {
-            stroke: rgba(255, 255, 255, 0.1);
+            stroke: #e8e8e8;
         }
 
         .progress-bar {
-            stroke: #444;
+            stroke: #22c55e;
+        }
+
+        .progress-bar.red {
+            stroke: #ef4444;
         }
 
         .status-dots {
@@ -215,9 +215,9 @@
         <div class="main-area">
             <div class="timer-circle" id="timerCircle">
                 <svg class="progress-ring">
-                    <circle class="progress-ring-circle progress-bg" cx="145" cy="145" r="135"></circle>
-                    <circle class="progress-ring-circle progress-bar" id="progressBar" cx="145" cy="145" r="135" 
-                            stroke-dasharray="848.23" stroke-dashoffset="848.23"></circle>
+                    <circle class="progress-ring-circle progress-bg" cx="145" cy="145" r="132"></circle>
+                    <circle class="progress-ring-circle progress-bar" id="progressBar" cx="145" cy="145" r="132" 
+                            stroke-dasharray="829.38" stroke-dashoffset="829.38"></circle>
                 </svg>
                 <div class="timer-display" id="timerDisplay">1:00</div>
             </div>
@@ -367,16 +367,16 @@
                 // Update display
                 this.display.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
                 
-                // Update circle color
+                // Update progress bar color
                 if (phase.type === 'red') {
-                    this.circle.classList.add('red');
+                    this.progress.classList.add('red');
                 } else {
-                    this.circle.classList.remove('red');
+                    this.progress.classList.remove('red');
                 }
                 
                 // Update progress
                 const elapsed = phase.duration - this.timeLeft;
-                const circumference = 848.23;
+                const circumference = 829.38;
                 const offset = circumference - (elapsed / phase.duration) * circumference;
                 this.progress.style.strokeDashoffset = offset;
                 
@@ -419,46 +419,66 @@
             lastTouch = now;
         }, false);
 
-        // Additional screen wake methods for iOS
-        let noSleep = {
-            enabled: false,
-            video: null,
-            
-            enable: function() {
-                if (!this.enabled) {
-                    this.video = document.createElement('video');
-                    this.video.setAttribute('muted', '');
-                    this.video.setAttribute('title', 'No Sleep');
-                    this.video.setAttribute('playsinline', '');
-                    
-                    this.video.addEventListener('loadedmetadata', () => {
-                        if (this.video.duration <= 1) {
-                            this.video.setAttribute('loop', '');
-                        }
-                    });
-                    
-                    // Create a tiny video to keep screen awake
-                    this.video.src = 'data:video/mp4;base64,AAAAIGZ0eXBtcDQyAAACAGlzb21pc28yYXZjMWdlb20AAAB4bW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAAASwAAAAAAQAAAQAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC5';
-                    
-                    this.video.play();
-                    this.enabled = true;
-                }
-            },
-            
-            disable: function() {
-                if (this.enabled && this.video) {
-                    this.video.pause();
-                    this.video.remove();
-                    this.video = null;
-                    this.enabled = false;
-                }
+        // Enhanced screen wake for iOS
+        function keepScreenAwake() {
+            // Method 1: Wake Lock API
+            if ('wakeLock' in navigator) {
+                navigator.wakeLock.request('screen').catch(() => {});
             }
-        };
+            
+            // Method 2: Video method for iOS Safari
+            const video = document.createElement('video');
+            video.setAttribute('muted', '');
+            video.setAttribute('playsinline', '');
+            video.setAttribute('webkit-playsinline', '');
+            video.style.position = 'absolute';
+            video.style.top = '-1px';
+            video.style.left = '-1px';
+            video.style.width = '1px';
+            video.style.height = '1px';
+            video.style.opacity = '0.01';
+            video.loop = true;
+            
+            // Create a very short looping video
+            video.src = 'data:video/mp4;base64,AAAAIGZ0eXBtcDQyAAACAGlzb21pc28yYXZjMWdlb20AAAB4bW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAAASwAAAAAAQAAAQAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC5';
+            
+            document.body.appendChild(video);
+            video.play().catch(() => {});
+            
+            // Method 3: Audio context for additional wake
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                gainNode.gain.value = 0.001; // Very quiet
+                oscillator.frequency.value = 20000; // Inaudible frequency
+                oscillator.start();
+            } catch (e) {}
+            
+            // Method 4: Periodic user interaction simulation
+            setInterval(() => {
+                if (timer.running) {
+                    // Trigger a tiny invisible element
+                    const dummy = document.createElement('div');
+                    dummy.style.position = 'absolute';
+                    dummy.style.top = '-1px';
+                    dummy.style.left = '-1px';
+                    dummy.style.width = '1px';
+                    dummy.style.height = '1px';
+                    dummy.style.opacity = '0';
+                    document.body.appendChild(dummy);
+                    dummy.scrollIntoView();
+                    setTimeout(() => document.body.removeChild(dummy), 100);
+                }
+            }, 15000); // Every 15 seconds
+        }
 
-        // Enable no-sleep when timer starts
-        document.addEventListener('click', () => {
-            noSleep.enable();
-        }, { once: true });
+        // Start wake methods immediately and on first interaction
+        keepScreenAwake();
+        document.addEventListener('touchstart', keepScreenAwake, { once: true });
+        document.addEventListener('click', keepScreenAwake, { once: true });
     </script>
 </body>
 </html>
